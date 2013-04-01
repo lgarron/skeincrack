@@ -17,6 +17,7 @@
 static const int HASHES_BEFORE_BENCHMARK = 1000000;
 
 static const char *param = "hashable=";
+static char* prefix = NULL;
 
 static bool benchmarkMode = false;
 
@@ -107,6 +108,10 @@ void *hashThread(void *aux) {
   read(randfd, buf, BUF_SIZE);
   normalizeBuffer(buf, BUF_SIZE);
 
+  if (prefix != NULL) {
+    memcpy(buf, prefix, strlen(prefix));
+  }
+
   int numHashes = 0;
   struct timeval startTimestamp;
   gettimeofday(&startTimestamp, NULL);
@@ -175,8 +180,13 @@ void *hashThread(void *aux) {
 int main(int argc, char** argv) {
   pthread_mutex_init(&bestLock, NULL);
 
-  if (argc == 2 && !strcmp("--benchmark", argv[1])) {
-    benchmarkMode = true;
+  for (int i = 1; i < argc; i++) {
+    if (!strcmp("--benchmark", argv[i]) || !strcmp("-b", argv[i])) {
+      benchmarkMode = true;
+    }
+    if (!strcmp("--prefix", argv[i]) || !strcmp("-p", argv[i])) {
+      prefix = argv[++i];
+    }
   }
 
   long numCPUs;
