@@ -184,8 +184,12 @@ int main(int argc, char** argv) {
     if (!strcmp("--benchmark", argv[i]) || !strcmp("-b", argv[i])) {
       benchmarkMode = true;
     }
-    if (!strcmp("--prefix", argv[i]) || !strcmp("-p", argv[i])) {
+    else if (!strcmp("--prefix", argv[i]) || !strcmp("-p", argv[i])) {
       prefix = argv[++i];
+    }
+    else if (!strcmp("--help", argv[i]) || !strcmp("-h", argv[i])) {
+      printf("Usage: %s [--help] [--benchmark] [--prefix STRING]\n", argv[0]);
+      exit(0);
     }
   }
 
