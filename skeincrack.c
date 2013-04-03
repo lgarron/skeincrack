@@ -18,6 +18,7 @@ static const int HASHES_BEFORE_BENCHMARK = 1000000;
 
 static const char *param = "hashable=";
 static char* prefix = NULL;
+static FILE* outfile = NULL;
 
 static enum {
   // We rely on BENCHMARK_MODE_OFF == 0
@@ -166,9 +167,17 @@ void *hashThread(void *aux) {
 
       // If here, this thread actually has the best hash
       printf("\n\nDistance: %d\n", distance);
+      if (outfile) {
+        fprintf(outfile, "\n\nDistance: %d\n", distance);
+        fflush(outfile);
+      }
       best = distance;
 
       printf("Data: %s\n", buf);
+      if (outfile) {
+        fprintf(outfile, "Data: %s\n", buf);
+        fflush(outfile);
+      }
 
       int outfd = open("data.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
       if(outfd < 0)
@@ -201,6 +210,10 @@ int main(int argc, char** argv) {
     }
     else if (!strcmp("--prefix", argv[i]) || !strcmp("-p", argv[i])) {
       prefix = argv[++i];
+    }
+    else if (!strcmp("--out", argv[i]) || !strcmp("-o", argv[i])) {
+      outfile = fopen(argv[++i], "w");
+      printf("File: %p\n", outfile);
     }
     else if (!strcmp("--help", argv[i]) || !strcmp("-h", argv[i])) {
       printf("Usage: %s [--help] [--benchmark] [--pgo] [--prefix STRING]\n", argv[0]);
