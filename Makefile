@@ -20,16 +20,21 @@ CFLAGS = -O3 -Wall -ICD/Optimized_64bit --std=c99 -pthread -fno-strict-aliasing 
 DEFINES = -DSKEIN_LOOP=0
 SRCS = CD/Optimized_64bit/*.c skeincrack.c
 
-all: skeincrack
+TARGET = skeincrack
+
+all: $(TARGET)
+
+run: all
+	./$(TARGET)
 
 skeincrack: Makefile skeincrack.c
 	$(CC) $(CFLAGS) $(DEFINES) $(SRCS) -o $@
 
 pgo: Makefile skeincrack.c
-	$(CC) $(CFLAGS) $(DEFINES) -fprofile-generate $(SRCS) -o skeincrack
-	./skeincrack --pgo
-	$(CC) $(CFLAGS) $(DEFINES) -fprofile-use $(SRCS) -o skeincrack
+	$(CC) $(CFLAGS) $(DEFINES) -fprofile-generate $(SRCS) -o $(TARGET)
+	./$(TARGET) --pgo
+	$(CC) $(CFLAGS) $(DEFINES) -fprofile-use $(SRCS) -o $(TARGET)
 
 .PHONY: clean
 clean:
-	rm -f *.o *.gcda skeincrack
+	rm -f *.o *.gcda $(TARGET)
