@@ -19,7 +19,7 @@ static const int HASHES_BEFORE_BENCHMARK = 1000000;
 static const char *param = "hashable=";
 static char* prefix = NULL;
 static FILE* outfile = NULL;
-static bool upload = false;
+static bool submit = false;
 
 static enum {
   // We rely on BENCHMARK_MODE_OFF == 0
@@ -180,16 +180,16 @@ void *hashThread(void *aux) {
         fflush(outfile);
       }
 
-      int outfd = open("data.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-      if(outfd < 0)
-        perror("can't open output file");
+      if (submit) {
+        int outfd = open("data.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if(outfd < 0)
+          perror("can't open output file");
 
-      write(outfd, param, strlen(param));
-      write(outfd, buf, BUF_SIZE);
-      fsync(outfd);
-      close(outfd);
+        write(outfd, param, strlen(param));
+        write(outfd, buf, BUF_SIZE);
+        fsync(outfd);
+        close(outfd);
 
-      if (upload) {
         submitData();
       }
 
@@ -217,7 +217,7 @@ void parse_args(int argc, char** argv) {
       benchmarkMode = BENCHMARK_MODE_NON_INTERACTIVE;
     }
     else if (!strcmp("--submit", argv[i]) || !strcmp("-s", argv[i])) {
-      upload = true;
+      submit = true;
     }
     else if (!strcmp("--help", argv[i]) || !strcmp("-h", argv[i])) {
       printf("Usage: %s [--help] [--benchmark] [--pgo] [--submit] [--out] [--prefix STRING]\n", argv[0]);
