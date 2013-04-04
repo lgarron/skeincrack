@@ -19,6 +19,7 @@ static const int HASHES_BEFORE_BENCHMARK = 1000000;
 static const char *param = "hashable=";
 static char* prefix = NULL;
 static FILE* outfile = NULL;
+static bool upload = false;
 
 static enum {
   // We rely on BENCHMARK_MODE_OFF == 0
@@ -188,7 +189,9 @@ void *hashThread(void *aux) {
       fsync(outfd);
       close(outfd);
 
-      submitData();
+      if (upload) {
+        submitData();
+      }
 
       pthread_mutex_unlock(&bestLock);
     }
@@ -215,8 +218,11 @@ int main(int argc, char** argv) {
       outfile = fopen(argv[++i], "w");
       printf("File: %p\n", outfile);
     }
+    else if (!strcmp("--submit", argv[i]) || !strcmp("-s", argv[i])) {
+      upload = true;
+    }
     else if (!strcmp("--help", argv[i]) || !strcmp("-h", argv[i])) {
-      printf("Usage: %s [--help] [--benchmark] [--pgo] [--prefix STRING]\n", argv[0]);
+      printf("Usage: %s [--help] [--benchmark] [--pgo] [--submit] [--prefix STRING]\n", argv[0]);
       exit(0);
     }
   }
