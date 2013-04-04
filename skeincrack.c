@@ -199,33 +199,44 @@ void *hashThread(void *aux) {
   return NULL; 
 }
 
+void parse_args(int argc, char** argv) {
 
-int main(int argc, char** argv) {
-  pthread_mutex_init(&bestLock, NULL);
+  benchmarkMode = BENCHMARK_MODE_OFF;
 
   for (int i = 1; i < argc; i++) {
-    benchmarkMode = BENCHMARK_MODE_OFF;
-    if (!strcmp("--benchmark", argv[i]) || !strcmp("-b", argv[i])) {
-      benchmarkMode = BENCHMARK_MODE_INTERACTIVE;
-    }
-    if (!strcmp("--pgo", argv[i]) || !strcmp("-b", argv[i])) {
-      benchmarkMode = BENCHMARK_MODE_NON_INTERACTIVE;
-    }
-    else if (!strcmp("--prefix", argv[i]) || !strcmp("-p", argv[i])) {
+    if (!strcmp("--prefix", argv[i]) || !strcmp("-p", argv[i])) {
       prefix = argv[++i];
     }
     else if (!strcmp("--out", argv[i]) || !strcmp("-o", argv[i])) {
       outfile = fopen(argv[++i], "w");
-      printf("File: %p\n", outfile);
+    }
+    else if (!strcmp("--benchmark", argv[i]) || !strcmp("-b", argv[i])) {
+      benchmarkMode = BENCHMARK_MODE_INTERACTIVE;
+    }
+    else if (!strcmp("--pgo", argv[i]) || !strcmp("-g", argv[i])) {
+      benchmarkMode = BENCHMARK_MODE_NON_INTERACTIVE;
     }
     else if (!strcmp("--submit", argv[i]) || !strcmp("-s", argv[i])) {
       upload = true;
     }
     else if (!strcmp("--help", argv[i]) || !strcmp("-h", argv[i])) {
-      printf("Usage: %s [--help] [--benchmark] [--pgo] [--submit] [--prefix STRING]\n", argv[0]);
+      printf("Usage: %s [--help] [--benchmark] [--pgo] [--submit] [--out] [--prefix STRING]\n", argv[0]);
+      printf(" --help, -h                   Print this help.\n");
+      printf(" --prefix STRING, -p STRING   Search for strings with the given prefix.\n");
+      printf(" --out, -o                    Write results to output file in addition to stdout.\n");
+      printf(" --benchmark, -b              Run benchmark.\n");
+      printf(" --pgo, -g                    Run PGO benchmark.\n");
+      printf(" --submit, -s                 Submit results to XKCD. No longer useful.\n");
       exit(0);
     }
   }
+}
+
+int main(int argc, char** argv) {
+
+  parse_args(argc, argv);
+
+  pthread_mutex_init(&bestLock, NULL);
 
   long numCPUs;
   if (!benchmarkMode) {
