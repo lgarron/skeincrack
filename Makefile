@@ -25,13 +25,7 @@ ifeq ($(uname_S),Darwin)
 	endif
 endif
 
-OPT = -O3
-ifeq ($(CC),clang)
-	# Yes, clang goes up to -O4. Link-time optimization.
-	OPT = -O4
-endif
-
-CFLAGS = -Wall -ICD/Optimized_64bit --std=c99 -pthread -fno-strict-aliasing -flto $(MARCH_SWITCH)
+CFLAGS = -O3 -Wall -ICD/Optimized_64bit --std=c99 -pthread -fno-strict-aliasing -flto $(MARCH_SWITCH)
 SRCS = CD/Optimized_64bit/*.c skeincrack.c
 TARGET = skeincrack
 
