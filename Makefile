@@ -35,7 +35,7 @@ run: all
 	./$(TARGET)
 
 test: all
-	./$(TARGET) --benchmark
+	./$(TARGET) --pgo
 
 skeincrack: Makefile skeincrack.c
 	$(CC) $(CFLAGS) $(DEFINES) $(SRCS) -o $@
